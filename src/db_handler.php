@@ -19,19 +19,34 @@ class DbHandler
     }
 
     public function updateDatabase($value){
-        var_dump($value);
         $stmt = $this->conn->prepare("INSERT INTO BTC_values(value) values (?)");
-        var_dump($stmt);
         $stmt->bind_param("d", $value);
-
         $result = $stmt->execute();
-        var_dump($result);
 
         if($result) echo "Updated!";
         else echo "Error!";
 
         $stmt->close();
 
+    }
+
+    public function getGraphData(){
+        $stmt = $this->conn->prepare("SELECT value, created_at FROM BTC_values");
+        $result = $stmt->execute();
+        $records = $stmt->get_result()->fetch_all();
+        $data = array();
+
+
+        foreach ($records as $record){
+            $data[] = $record;
+        }
+
+        $stmt->close();
+        if($result){
+            return $data;
+        } else {
+            return -1;
+        }
     }
 
 }
