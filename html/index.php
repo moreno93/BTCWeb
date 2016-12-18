@@ -10,7 +10,11 @@ session_start();
 
 if (isset($_SESSION['user_id'])){
     $user = new User($_SESSION['user_id'], null, null);
-    $currentUser = $user->getUserById($_SESSION['user_id']);
+    try {
+        $currentUser = $user->getUserById($_SESSION['user_id']);
+    } catch (Exception $e){
+        $exception = $e->getMessage();
+    }
 }
 ?>
 
@@ -30,9 +34,15 @@ if (isset($_SESSION['user_id'])){
 
 <body style="padding-top: 65px;">
 <nav class="navbar navbar-default navbar-fixed-top">
-    <?php
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="index.php">
+                <img alt="Logo" src="img/logo.svg" width="50" height="50">
+            </a>
+        </div>
+        <?php
         if(isset($currentUser)){
-    ?>
+            ?>
             <form class="navbar-form navbar-right">
                 <div class="form-group">
                     <p class="navbar-text">Welcome <?php echo $currentUser['firstName'] . " " . $currentUser['lastName']; ?> </p>
@@ -40,9 +50,9 @@ if (isset($_SESSION['user_id'])){
                 </div>
             </form>
 
-    <?php
+            <?php
         } else {
-    ?>
+            ?>
             <form class="navbar-form navbar-right" method="POST" action="login.php">
                 <div class="form-group">
                     <input type="text" class="form-control" placeholder="Email" name="email">
@@ -51,10 +61,28 @@ if (isset($_SESSION['user_id'])){
                 <button type="submit" class="btn btn-default">Login</button>
                 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#registerModal">Register</button>
             </form>
+            <?php
+        }
+        ?>
+    </div>
+
+</nav>
+<?php
+    if(isset($_GET['m']) || isset($exception)){
+        if(isset($_GET['m'])) $message = $_GET['m'];
+        if(isset($exception)) $message = $exception;
+        ?>
+        <div class="contanier">
+            <div id="message">
+                <div class="alert alert-info alert-dismissable">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+                    <strong><?php echo $message; ?></strong>
+                </div>
+            </div>
+        </div>
     <?php
     }
     ?>
-</nav>
 <div class="container">
     <div id="current_value">
         <p>Current value of BTC is <strong><span id="BTC_value"> </span> USD</strong></p>

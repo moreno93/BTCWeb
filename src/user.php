@@ -24,10 +24,10 @@ class User
 
     public function register($firstName, $lastName, $email, $password, $repeatPassword){
         if($password != $repeatPassword){
-            return "Passwords doesn't match!";
+            throw new Exception("Passwords doesn't match!");
         }
         if ($this->isEmailExists($email)){
-            return "This email is already in use";
+            throw new Exception("This email is already in use");
         }
 
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
@@ -37,7 +37,7 @@ class User
         $result = $stmt->execute();
         $stmt->close();
         if(!$result){
-            return "Error inserting into database";
+            throw new Exception("Error inserting into database");
         }
         return true;
     }
@@ -49,7 +49,7 @@ class User
             $_SESSION['user_id'] = $user['id'];
             return $user['id'];
         }
-        return false;
+        throw new Exception("Username or password doesn't match");
     }
 
     public function isLoggedIn(){
@@ -84,12 +84,17 @@ class User
             $this->_user = $tmp;
             return $this->_user;
         } else {
-            return false;
+            throw new Exception("Cannot fetch user");
         }
     }
 
     public function redirect($url, $statusCode = 303){
         header('Location:' . $url, true, $statusCode);
+        exit();
+    }
+
+    public function redirectWithMessage($url, $message, $statusCode = 303){
+        header('Location:' . $url . '?m=' . $message, true, $statusCode);
         exit();
     }
 
