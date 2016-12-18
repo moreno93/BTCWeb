@@ -1,9 +1,9 @@
 <?php
 
-require_once "db_handler.php";
+require_once "btc.php";
 
-$db = new DbHandler();
+$btc = new BTC();
 
-$BTCvalue = $db->getBTCValue();
+$BTCvalue = $btc->getBTCValue();
 
-$db->updateDatabase($BTCvalue);
+$btc->updateDatabase($BTCvalue);

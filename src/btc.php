@@ -1,6 +1,6 @@
 <?php
 
-class DbHandler
+class BTC
 {
     private $conn;
 

@@ -5,6 +5,6 @@ require_once "../src/btc.php";
 
 $btc = new BTC();
 
-$data = $btc->getGraphData();
+$value = $btc->getBTCValue();
 
-echo json_encode($data);
+echo $value;
