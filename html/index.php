@@ -33,7 +33,7 @@ if (isset($_SESSION['user_id'])){
 </head>
 
 <body style="padding-top: 65px;">
-<nav class="navbar navbar-default navbar-fixed-top">
+<nav class="navbar navbar-default navbar-fixed-top" style="height: 30px">
     <div class="container-fluid">
         <div class="navbar-header">
             <a class="navbar-brand" href="index.php">
@@ -46,6 +46,7 @@ if (isset($_SESSION['user_id'])){
             <form class="navbar-form navbar-right">
                 <div class="form-group">
                     <p class="navbar-text">Welcome <?php echo $currentUser['firstName'] . " " . $currentUser['lastName']; ?> </p>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#notificationModal">Notification settings</button>
                     <a class="btn btn-default" href="logout.php?user_id=<?php echo $currentUser['id']; ?>">Logout</a>
                 </div>
             </form>
@@ -122,6 +123,56 @@ if (isset($_SESSION['user_id'])){
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Register</button>
+                    <button type="button" class="btn btn-neutral" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id='notificationModal'>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Notifications settings</h4>
+            </div>
+            <form method='POST' action=''>
+                <div class="modal-body">
+                    <?php if($currentUser['percentage'] == null) { ?>
+                        <fieldset class="form-group">
+                            <p>You don't have notifications enabled. <br>
+                                Use form below to enable it!
+                            </p>
+                        </fieldset>
+                    <?php } else { ?>
+                        <fieldset class="form-group">
+                            <p>You will be notified if BTC value gets changed by <strong><?php echo $currentUser['percentage']; ?>%</strong> <br>
+                                Use form below if you wish to change percentage.
+                            </p>
+                        </fieldset>
+                    <?php } ?>
+                    <fieldset class="form-group">
+                        <label>Notify me on BTC percentage change:</label>
+                        <select class="form-control" id="percentage">
+                            <option>1%</option>
+                            <option>2%</option>
+                            <option>3%</option>
+                            <option>4%</option>
+                            <option>5%</option>
+                            <option>6%</option>
+                            <option>7%</option>
+                            <option>8%</option>
+                            <option>9%</option>
+                            <option>10%</option>
+                        </select>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Update notifications</button>
                     <button type="button" class="btn btn-neutral" data-dismiss="modal">Cancel</button>
                 </div>
             </form>
