@@ -4,6 +4,10 @@ require_once "btc.php";
 
 $btc = new BTC();
 
-$BTCvalue = $btc->getBTCValue();
+try{
+    $btc->deleteOldDbRecords();
+} catch (Exception $e){
+    echo $e->getMessage();
+}
 
-$btc->deleteOldDbRecords();
+

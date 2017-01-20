@@ -70,7 +70,7 @@ class User
         $stmt = $this->conn->prepare('SELECT * FROM users WHERE id=?');
         $stmt->bind_param("i", $id);
         if($stmt->execute()){
-            $stmt->bind_result($id, $firstName, $lastName, $email, $password, $percentage, $created_at);
+            $stmt->bind_result($id, $firstName, $lastName, $email, $password, $percentage, $created_at, $notification_time);
             $stmt->fetch();
             $tmp = array();
             $tmp["id"] = $id;
@@ -80,6 +80,7 @@ class User
             $tmp["password"] = $password;
             $tmp['percentage'] = $percentage;
             $tmp['created_at'] = $created_at;
+            $tmp['notification_time'] = $notification_time;
             $stmt->close();
             $this->_user = $tmp;
             return $this->_user;
@@ -96,6 +97,74 @@ class User
     public function redirectWithMessage($url, $message, $statusCode = 303){
         header('Location:' . $url . '?m=' . $message, true, $statusCode);
         exit();
+    }
+
+
+    public function updateNotifications($id, $value){
+        $stmt = $this->conn->prepare('UPDATE users SET percentage = ?, notification_time = now() WHERE id = ?');
+        $stmt->bind_param("ii", $value, $id);
+        $result = $stmt->execute();
+        $stmt->close();
+        if(!$result){
+            throw new Exception("Error updating notification");
+        }
+        return true;
+    }
+
+    public function resetNotifications($id){
+        $stmt = $this->conn->prepare('UPDATE users SET percentage = null, notification_time = now() WHERE id = ?');
+        $stmt->bind_param("i", $id);
+        $result = $stmt->execute();
+        $stmt->close();
+        if(!$result){
+            throw new Exception("Error resetting notification");
+        }
+        return true;
+    }
+
+    public function getUsersWithNotifications(){
+        $stmt = $this->conn->prepare("SELECT id, first_name, last_name, email, percentage FROM users WHERE percentage IS NOT null");
+        $stmt->execute();
+        $stmt->bind_result($id, $firstName, $lastName, $email, $percentage);
+        while($stmt->fetch()){
+            $tmp['id'] = $id;
+            $tmp['firstName'] = $firstName;
+            $tmp['lastName'] = $lastName;
+            $tmp['email'] = $email;
+            $tmp['percentage'] = $percentage;
+            $users[] = $tmp;
+        }
+        $stmt->close();
+        return $users;
+    }
+
+    public function getNotificationBTCValue($id){
+        $stmt = $this->conn->prepare('SELECT BTC_values.value FROM BTC_values WHERE BTC_values.created_at <= (SELECT users.notification_time FROM users WHERE users.id = ?) LIMIT 1');
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->bind_result($notificationValue);
+        if($stmt->fetch()){
+            $stmt->close();
+            return $notificationValue;
+        }
+    }
+
+    public function sendMail($email, $firstName, $lastName, $change, $currentValue, $notificationValue){
+
+
+        $to = $email;
+        $subject = "BTC value change";
+        $message = $firstName . " " . $lastName . " we wish to inform you that BTC value has change by " . $change . "%\r\n.
+            On the time you set your notification BTC value was " . $notificationValue .
+            " USD and on the time this mail was sent it was " . $currentValue . "USD.\r\n 
+            Your notification has been reset. If you wish to enable it again please login into your account";
+
+        if(mail($to, $subject, $message)){
+            return true;
+        } else{
+            throw new Exception("Error sending mail");
+        }
+
     }
 
 
@@ -132,7 +201,5 @@ class User
         }
         return false;
     }
-
-
 
 }

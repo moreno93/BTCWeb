@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 
 <?php
-error_reporting(-1);
-ini_set('display_errors', 'On');
 
 require "../src/user.php";
 
@@ -140,7 +138,8 @@ if (isset($_SESSION['user_id'])){
                 </button>
                 <h4 class="modal-title">Notifications settings</h4>
             </div>
-            <form method='POST' action=''>
+            <form method='POST' action='update_notifications.php'>
+                <input type="hidden" value="<?php echo $currentUser['id'] ?>" name="id">
                 <div class="modal-body">
                     <?php if($currentUser['percentage'] == null) { ?>
                         <fieldset class="form-group">
@@ -157,7 +156,7 @@ if (isset($_SESSION['user_id'])){
                     <?php } ?>
                     <fieldset class="form-group">
                         <label>Notify me on BTC percentage change:</label>
-                        <select class="form-control" id="percentage">
+                        <select class="form-control" name="percentage">
                             <option>1%</option>
                             <option>2%</option>
                             <option>3%</option>

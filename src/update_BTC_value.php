@@ -6,4 +6,8 @@ $btc = new BTC();
 
 $BTCvalue = $btc->getBTCValue();
 
-$btc->updateDatabase($BTCvalue);
+try{
+    $btc->updateDatabase($BTCvalue);
+} catch (Exception $e){
+    echo $e->getMessage();
+}
