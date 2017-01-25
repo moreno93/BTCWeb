@@ -102,7 +102,7 @@ class User
 
     public function updateNotifications($id, $value){
         $stmt = $this->conn->prepare('UPDATE users SET percentage = ?, notification_time = now() WHERE id = ?');
-        $stmt->bind_param("ii", $value, $id);
+        $stmt->bind_param("di", $value, $id);
         $result = $stmt->execute();
         $stmt->close();
         if(!$result){
@@ -126,6 +126,7 @@ class User
         $stmt = $this->conn->prepare("SELECT id, first_name, last_name, email, percentage FROM users WHERE percentage IS NOT null");
         $stmt->execute();
         $stmt->bind_result($id, $firstName, $lastName, $email, $percentage);
+        $users = array();
         while($stmt->fetch()){
             $tmp['id'] = $id;
             $tmp['firstName'] = $firstName;
@@ -135,11 +136,15 @@ class User
             $users[] = $tmp;
         }
         $stmt->close();
-        return $users;
+        if(!empty($users)){
+            return $users;
+        } else {
+            return false;
+        }
     }
 
     public function getNotificationBTCValue($id){
-        $stmt = $this->conn->prepare('SELECT BTC_values.value FROM BTC_values WHERE BTC_values.created_at <= (SELECT users.notification_time FROM users WHERE users.id = ?) LIMIT 1');
+        $stmt = $this->conn->prepare('SELECT BTC_values.value FROM BTC_values WHERE BTC_values.created_at <= (SELECT users.notification_time FROM users WHERE users.id = ?) ORDER BY BTC_values.created_at DESC LIMIT 1');
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $stmt->bind_result($notificationValue);

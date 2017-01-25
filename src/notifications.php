@@ -10,6 +10,7 @@ $user = new User(null, null, null);
 $currentValue = $btc->getBTCValue();
 $users = $user->getUsersWithNotifications();
 
+if (!$users) exit();
 
 foreach ($users as $usr){
     $notificationBTC = $user->getNotificationBTCValue($usr['id']);
@@ -20,9 +21,9 @@ foreach ($users as $usr){
     if($change >= $usr['percentage']){
         try {
             $user->sendMail($usr['email'], $usr['firstName'], $usr['lastName'], $change, $currentValue, $notificationBTC);
-            file_put_contents('mail.log', 'Successfully sent email to ' . $usr['email']);
+            file_put_contents('mail.log', 'Successfully sent email to ' . $usr['email'] . '\r\n', FILE_APPEND);
         } catch (Exception $e){
-            file_put_contents('mail.log', 'Error sending email to ' . $usr['email']);
+            file_put_contents('mail.log', 'Error sending email to ' . $usr['email'] . '\r\n', FILE_APPEND);
         }
 
         try {
